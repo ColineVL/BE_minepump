@@ -1,0 +1,18 @@
+exercice 5 :
+
+    Priorites des mutexes :
+
+int pthread_mutexattr_getprotocol(const pthread_mutexattr_t *restrict attr, int *restrict protocol);
+
+    attr : 
+        doit etre crée et initialisé par pthread_mutexattr_init()
+    
+    protocol :
+        prend l'une des trois valeurs suivantes :
+            PTHREAD_PRIO_NONE       -> aucun protocole
+            PTHREAD_PRIO_INHERIT    -> priorité du mutex mise a jour dynamiquement à la plus haute des threads qui essayent d' y accéder
+            PTHREAD_PRIO_PROTECT    -> priorité statique attribuée au thread qui possede le mutex
+
+
+pthread_attr_t attr;
+pthread_attr_init(&attr);
