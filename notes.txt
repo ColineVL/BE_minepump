@@ -1,18 +1,25 @@
 exercice 5 :
 
-    Priorites des mutexes :
-
-int pthread_mutexattr_getprotocol(const pthread_mutexattr_t *restrict attr, int *restrict protocol);
-
-    attr : 
-        doit etre crée et initialisé par pthread_mutexattr_init()
-    
-    protocol :
-        prend l'une des trois valeurs suivantes :
-            PTHREAD_PRIO_NONE       -> aucun protocole
-            PTHREAD_PRIO_INHERIT    -> priorité du mutex mise a jour dynamiquement à la plus haute des threads qui essayent d' y accéder
-            PTHREAD_PRIO_PROTECT    -> priorité statique attribuée au thread qui possede le mutex
+The mutex that protects the minteger needs to have a protocol to tell in which order threads waiting for it will access it.
 
 
-pthread_attr_t attr;
-pthread_attr_init(&attr);
+minteger.c:
+	pthread_mutex_init needs a pthread_mutexattr_t* to set the attributes of the mutex, in particular the protocol.
+	Two choices are available : INHERIT and PROTECT,
+	INHERIT dynamically sets the priority of the thread in possession of the mutex to the highest priority of the threads that want to access it
+	PROTECT statically sets the priority to a level determined by the developper, which should be the highest priority of the treads that could want to access the mutex
+	Since we have a very simple program we can determine the priorities of every thread, so we choose to set the static protocol.
+	Following are the steps to create and set those attributes :
+		// create the pointer to the attributes structure
+		pthread_mutexattr_t *p_attr;
+		// initialize it
+		pthread_mutexattr_init(p_attr);
+		// set the protocol
+		pthread_mutexattr_setprotocol(p_attr, PTHREAD_PRIO_PROTECT);
+		// set the priority ceiling
+		pthread_mutexattr_setprioceiling(p_attr, some_value);
+
+
+
+msg_box.c:
+	pthread_cond_init also needs a structure to specify a protocol 

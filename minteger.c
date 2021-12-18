@@ -10,7 +10,7 @@ m_integer MI_init(int priority)
   m_integer m;
   m = (m_integer)malloc(sizeof(struct s_m_integer));
   (*m).value = 0;
-  /* Configure mutex, using a concurrency control policy */
+  // The mutex is initialized without any access policy in this version
   pthread_mutex_init(&((*m).mutex), NULL);
   return m;
 }
@@ -18,6 +18,7 @@ m_integer MI_init(int priority)
 /*****************************************************************************/
 void MI_write(m_integer m, int v)
 {
+  // locks the mutex, writes the integer, then releases the mutex
   pthread_mutex_lock(&((*m).mutex));
   (*m).value = v;
   pthread_mutex_unlock(&((*m).mutex));
@@ -26,6 +27,7 @@ void MI_write(m_integer m, int v)
 /*****************************************************************************/
 int MI_read(m_integer m)
 {
+  // locks the mutex, reads the integer and assigns it to a variable, then releases the mutex
   int v;
 
   pthread_mutex_lock(&((*m).mutex));

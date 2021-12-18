@@ -20,8 +20,11 @@ void *periodic_task_body(void *parameters)
   sem_init(&timer, 0, 0);
   clock_gettime(CLOCK_REALTIME, &trigger);
 
+  // periodic task executes indefinitely
   for (;;)
   {
+    // runs the job
+    // then waits for the nex period to be triggered
     (*my_parameters).job();
     add_timespec(&trigger, &trigger, &period);
     sem_timedwait(&timer, &trigger);

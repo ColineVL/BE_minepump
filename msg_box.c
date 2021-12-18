@@ -27,6 +27,8 @@ msg_box msg_box_init(const unsigned elt_size)
   (*mbox).elt_size = elt_size;
 
   /* Create mutex and cond. var. */
+  // the cond. variable is used to inform other processes that something has been writen to the box 
+  // (does not guarantee that the box is not empty)
   pthread_mutex_init(&((*mbox).mutex), NULL);
   pthread_cond_init(&((*mbox).not_empty), NULL);
 
@@ -37,8 +39,10 @@ msg_box msg_box_init(const unsigned elt_size)
 int msg_box_receive(msg_box mbox, char *buf)
 {
 
+  // first waits to take the mutex
   pthread_mutex_lock(&((*mbox).mutex));
-  /* Wait until the message box has a message */
+  // if the box is empty, then wait until it receives a message
+  // in the meantime release the mutex
   while ((*mbox).empty)
   {
     pthread_cond_wait(&((*mbox).not_empty), &((*mbox).mutex));
@@ -56,8 +60,11 @@ int msg_box_receive(msg_box mbox, char *buf)
 int msg_box_send(msg_box mbox, const char *buf)
 {
 
+  // locks the mutex
+  // then writes the message to the msg box
+  // broadcasts the signal that the box has received a message
+  // finally releases the mutex
   pthread_mutex_lock(&((*mbox).mutex));
-  /* Copy the message */
   memcpy((*mbox).buf, buf, (*mbox).elt_size);
   (*mbox).empty = false;
   pthread_cond_broadcast(&((*mbox).not_empty));
