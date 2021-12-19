@@ -24,7 +24,7 @@ minteger.c:
 We then need to set a real-time scheduling policy and give priorities to threads so as to guarantee real-time properties
 
 
-periodic_task.c:
+periodic_task.c/minepump.c:
 	We need to chose a scheduling policy and to set threads priorities.
 	For the scheduling policy two "real-time" choices are available : FIFO and ROUND ROBIN
 	(other non-real-time choices are available which do not have any priority policy)
