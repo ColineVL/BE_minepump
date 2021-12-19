@@ -1,6 +1,6 @@
 exercice 5 :
 
-The mutex that protects the minteger needs to have a protocol to tell in which order threads waiting for it will access it.
+The mutexes that protect the minteger and the message boxes need to have a protocol to tell in which order to give access to waiting threads, in order to avoid priority inversion.
 
 
 minteger.c:
@@ -21,5 +21,32 @@ minteger.c:
 
 
 
-msg_box.c:
-	pthread_cond_init also needs a structure to specify a protocol 
+We then need to set a real-time scheduling policy and give priorities to threads so as to guarantee real-time properties
+
+
+periodic_task.c:
+	We need to chose a scheduling policy and to set threads priorities.
+	For the scheduling policy two "real-time" choices are available : FIFO and ROUND ROBIN
+	(other non-real-time choices are available which do not have any priority policy)
+	We choose FIFO for its simplicity of usage and analysis
+	As specified in the documentation, "Scheduling parameters are in fact per-thread attributes on Linux" (https://linux.die.net/man/2/sched_setparam)
+	More explanations from the documentation : 
+	"Conceptually, the scheduler maintains a list of runnable processes for each possible sched_priority value. In order to determine which process runs next, the scheduler looks for the nonempty list with the highest static priority and selects the process at the head of this list. A process's scheduling policy determines where it will be inserted into the list of processes with equal static priority and how it will move inside this list." (https://linux.die.net/man/2/sched_setscheduler)
+	We then attribute a scheduling policy and a priority to every thread at its creation
+	Following are the steps to create and set those attributes :
+		// at the beginning of the file
+		#include <sched.h>
+		// create the structure of scheduler parameters
+		sched_param *p_param;
+		// set a priority into the parameters structure
+		p_param->sched_priority = some_value;
+		// set the scheduler policy for the given thread
+		sched_setscheduler(&tid, SCHED_FIFO, p_param);
+
+Note : sched_priority value in the range 1 (low) to 99 (high)
+
+
+
+We didn't specify the priorities here, since they have to be determined by an analysis of the system and the real-time requirements.
+We can only infer that the methane control flow must be prior to the water level control flow.
+
